@@ -19,9 +19,7 @@ $report->setData( 'import.company.create', intval( rand( 1, 60 ) ) );
 $report->appendToData( 'import.company.create', intval( rand( 1, 60 ) ) );
 $report->setData( 'import.company.time_import', intval( rand( 20, 40 ) ) );
 $report->setData( 'import.company.update', intval( rand( 60,100 ) ) );
-
-$sender = OWMonitoringZabbixTool::instance( );
-$sender->sendReport( $report );
+$report->sendReport( $report );
 
 $script->shutdown( 0 );
 ?>

@@ -58,4 +58,11 @@ class OWMonitoringReport {
         }
     }
 
+    public function sendReport( ) {
+        $INI = eZINI::instance( 'owmonitoring.ini' );
+        $monitoringToolClass = $INI->variable( 'OWMonitoring', 'MonitoringToolClass' );
+        $tool = $monitoringToolClass::instance( );
+        $tool->sendReport( $this );
+    }
+
 }
