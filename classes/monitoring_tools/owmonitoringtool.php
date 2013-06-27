@@ -1,6 +1,6 @@
 <?php
 
-class OWMonitoringTool {
+abstract class OWMonitoringTool {
 
     /* Send report to the monitoring tool */
     abstract public function sendReport( OWMonitoringReport $report );
