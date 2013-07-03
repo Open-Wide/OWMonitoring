@@ -5,9 +5,16 @@ class OWMonitoringReport {
     protected $identifier;
     protected $reportData;
 
-    public function __contruct( $identifier ) {
+    public function __construct( $identifier ) {
+        if( empty( $identifier ) ) {
+            throw new Exception( "Report identifier must be set" );
+        }
         $this->identifier = $identifier;
         $this->reportData = array( );
+    }
+
+    public function getIdentifier( ) {
+        return $this->identifier;
     }
 
     public function hasData( $name ) {
@@ -60,7 +67,15 @@ class OWMonitoringReport {
 
     public function sendReport( ) {
         $INI = eZINI::instance( 'owmonitoring.ini' );
+        if( !$INI->hasVariable( 'OWMonitoring', 'MonitoringToolClass' ) ) {
+            OWMonitoringLogger::writeError( "[OWMonitoring]MonitoringToolClass not defined in owmonitoring.ini" );
+            return FALSE;
+        }
         $monitoringToolClass = $INI->variable( 'OWMonitoring', 'MonitoringToolClass' );
+        if( !class_exists( $monitoringToolClass ) ) {
+            OWMonitoringLogger::writeError( "Class $monitoringToolClass not found" );
+            return FALSE;
+        }
         $tool = $monitoringToolClass::instance( );
         $tool->sendReport( $this );
     }
