@@ -1,7 +1,5 @@
 <?php
 
-// using composer.phar
-
 class OWMonitoringZabbixTool extends OWMonitoringTool {
 
     protected $agentConfig;
