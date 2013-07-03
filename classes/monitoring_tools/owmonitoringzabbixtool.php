@@ -1,6 +1,5 @@
 <?php
 
-require_once 'extension/owmonitoring/lib/php-zabbix-sender/vendor/autoload.php';
 // using composer.phar
 
 class OWMonitoringZabbixTool extends OWMonitoringTool {
