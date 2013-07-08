@@ -44,7 +44,6 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             } else {
                 $this->sender->addData( $this->hostname, $reportDataPrefix . '.' . $name, $value );
             }
-             $this->sender->addData( $this->hostname, $reportDataPrefix . 'toto.' . $name, $value );
         }
         try {
             $result = $this->sender->send( );
@@ -56,10 +55,10 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             $failed = $this->sender->getLastFailed( );
             $total = $this->sender->getLastTotal( );
             $spent = $this->sender->getLastSpent( );
-            $resultLog .= ">> parsedInfo: processed = $processed\n";
-            $resultLog .= ">> parsedInfo: failed    = $failed\n";
-            $resultLog .= ">> parsedInfo: total     = $total\n";
-            $resultLog .= ">> parsedInfo: spent     = $spent sec";
+            $resultLog .= sprintf( ">> parsedInfo: processed = %d\n", $processed );
+            $resultLog .= sprintf( ">> parsedInfo: failed    = %d\n", $failed );
+            $resultLog .= sprintf( ">> parsedInfo: total     = %d\n", $total );
+            $resultLog .= sprintf( ">> parsedInfo: spent     = %f sec", $spent );
             if( $failed == 0 ) {
                 OWMonitoringLogger::writeNotice( $report->getIdentifier( ) . " report has been successfully sent to Zabbix.\n" . $resultLog );
             } else {
