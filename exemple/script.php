@@ -19,9 +19,16 @@ try {
     $report->appendToData( 'create', intval( rand( 1, 60 ) ) );
     $report->setData( 'time_import', intval( rand( 20, 40 ) ) );
     $report->setData( 'update', intval( rand( 60, 100 ) ) );
-    $report->sendReport( $report );
+    $report->sendReport( );
 } catch(Exception $e) {
-    echo $e->getMessage( );
+    echo $e->getMessage( ) . PHP_EOL;
+}
+
+try {
+    $report = OWMonitoringReport::makeReport( 'DatabaseIntegrity' );
+    $report->sendReport( );
+} catch(Exception $e) {
+    echo $e->getMessage( ) . PHP_EOL;
 }
 
 $script->shutdown( 0 );
