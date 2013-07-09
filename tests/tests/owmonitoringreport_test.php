@@ -1,9 +1,17 @@
 <?php
 
-class OWMonitoringReportTest extends ezpTestCase {
+class OWMonitoringReportTest extends ezpDatabaseTestCase {
     public function __construct( ) {
         parent::__construct( );
         $this->setName( "OWMonitoringReport Unit Tests" );
+    }
+
+    public function setUp( ) {
+        parent::setUp( );
+    }
+
+    public function tearDown( ) {
+        parent::tearDown( );
     }
 
     public function test__constructSansIndentifient( ) {
@@ -36,27 +44,48 @@ class OWMonitoringReportTest extends ezpTestCase {
         $report = new OWMonitoringReport( 'test.report' );
         $this->assertEquals( $report->getData( 'test' ), FALSE );
         $report->setData( 'test', 'test' );
-        $this->assertEquals( $report->getData( 'test' ), 'test' );
+        $this->assertEquals( $report->getData( 'test' ), array( 'data' => 'test' ) );
     }
 
     public function testSetData( ) {
         $report = new OWMonitoringReport( 'test.report' );
         $this->assertEquals( $report->getData( 'test' ), FALSE );
         $report->setData( 'test', 'test' );
-        $this->assertEquals( $report->getData( 'test' ), 'test' );
+        $this->assertEquals( $report->getData( 'test' ), array( 'data' => 'test' ) );
         $report->setData( 'test', 'test_2' );
-        $this->assertEquals( $report->getData( 'test' ), 'test_2' );
+        $this->assertEquals( $report->getData( 'test' ), array( 'data' => 'test_2' ) );
+        $time = time( );
+        $report->setData( 'test', 'test_2', $time );
+        $this->assertEquals( $report->getData( 'test' ), array(
+            'data' => 'test_2',
+            'clock' => $time
+        ) );
+        $report->setData( 'test', array(
+            'test',
+            'test_2'
+        ), $time );
+        $this->assertEquals( $report->getData( 'test' ), array(
+            array(
+                'data' => 'test',
+                'clock' => $time
+            ),
+            array(
+                'data' => 'test_2',
+                'clock' => $time
+            )
+        ) );
+
     }
 
     public function testAppendToData( ) {
         $report = new OWMonitoringReport( 'test.report' );
         $this->assertEquals( $report->getData( 'test' ), FALSE );
         $report->setData( 'test', 'test' );
-        $this->assertEquals( $report->getData( 'test' ), 'test' );
+        $this->assertEquals( $report->getData( 'test' ), array( 'data' => 'test' ) );
         $report->appendToData( 'test', 'test_2' );
         $this->assertEquals( $report->getData( 'test' ), array(
-            'test',
-            'test_2'
+            array( 'data' => 'test' ),
+            array( 'data' => 'test_2' )
         ) );
     }
 
@@ -64,7 +93,7 @@ class OWMonitoringReportTest extends ezpTestCase {
         $report = new OWMonitoringReport( 'test.report' );
         $this->assertEquals( $report->getData( 'test' ), FALSE );
         $report->setData( 'test', 'test' );
-        $this->assertEquals( $report->getData( 'test' ), 'test' );
+        $this->assertEquals( $report->getData( 'test' ), array( 'data' => 'test' ) );
         $report->deleteData( 'test' );
         $this->assertEquals( $report->getData( 'test' ), FALSE );
     }
@@ -75,8 +104,8 @@ class OWMonitoringReportTest extends ezpTestCase {
         $report->setData( 'test', 'test' );
         $report->setData( 'test_2', 'test_2' );
         $this->assertEquals( $report->getDatas( ), array(
-            'test' => 'test',
-            'test_2' => 'test_2'
+            'test' => array( array( 'data' => 'test' ) ),
+            'test_2' => array( array( 'data' => 'test_2' ) )
         ) );
     }
 
@@ -88,8 +117,22 @@ class OWMonitoringReportTest extends ezpTestCase {
             'test_2' => 'test_2'
         ) );
         $this->assertEquals( $report->getDatas( ), array(
-            'test' => 'test',
+            'test' => array( array( 'data' => 'test' ) ),
+            'test_2' => array( array( 'data' => 'test_2' ) )
+        ) );
+        $report->setDatas( array(
+            'test' => array(
+                'test_A',
+                'test_B'
+            ),
             'test_2' => 'test_2'
+        ) );
+        $this->assertEquals( $report->getDatas( ), array(
+            'test' => array(
+                array( 'data' => 'test_A' ),
+                array( 'data' => 'test_B' )
+            ),
+            'test_2' => array( array( 'data' => 'test_2' ) )
         ) );
     }
 
@@ -100,13 +143,13 @@ class OWMonitoringReportTest extends ezpTestCase {
             'test_2' => 'test_2'
         ) );
         try {
-            $this->assertEquals( $report->sendReport(), FALSE );
+            $this->assertEquals( $report->sendReport( ), FALSE );
         } catch (Exception $e) {
-            $this->fail('sendReport raise an exception');
+            $this->fail( 'sendReport raise an exception' );
         }
     }
-    
-    public function testMakeReport() {
+
+    public function testMakeReport( ) {
         self::markTestIncomplete( "Not implemented" );
     }
 

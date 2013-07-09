@@ -1,9 +1,17 @@
 <?php
 
-class OWMonitoringZabbixToolTest extends ezpTestCase {
+class OWMonitoringZabbixToolTest extends ezpDatabaseTestCase {
     public function __construct( ) {
         parent::__construct( );
         $this->setName( "OWMonitoringZabbixTool Unit Tests" );
+    }
+
+    public function setUp( ) {
+        parent::setUp( );
+    }
+
+    public function tearDown( ) {
+        parent::tearDown( );
     }
 
     public function testInstance( ) {
