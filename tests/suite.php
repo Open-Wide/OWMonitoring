@@ -8,6 +8,7 @@ class OWMonitiringTestSuite extends ezpDatabaseTestSuite {
         $this->insertDefaultData = false;
         $this->setName( "OW Monitoring Test Suite" );
         $this->addTestSuite( 'OWMonitoringReportTest' );
+        $this->addTestSuite( 'OWMonitoringZabbixToolTest' );
     }
 
     public static function suite( ) {

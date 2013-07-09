@@ -81,7 +81,7 @@ class OWMonitoringReport {
             return FALSE;
         }
         $tool = $monitoringToolClass::instance( );
-        $tool->sendReport( $this );
+        return $tool->sendReport( $this );
     }
 
     static function makeReport( $reportName ) {

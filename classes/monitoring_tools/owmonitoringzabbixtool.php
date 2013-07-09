@@ -59,11 +59,14 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             $resultLog .= sprintf( ">> parsedInfo: spent     = %f sec", $spent );
             if( $failed == 0 ) {
                 OWMonitoringLogger::writeNotice( $report->getIdentifier( ) . " report has been successfully sent to Zabbix.\n" . $resultLog );
+                return TRUE;
             } else {
                 OWMonitoringLogger::writeWarning( $report->getIdentifier( ) . " report has been successfully sent to Zabbix but some data failed.\n" . $resultLog );
+                return TRUE;
             }
         } catch( Exception $e ) {
             OWMonitoringLogger::writeNotice( "Report " . $report->getIdentifier( ) . " can not be sent to Zabbix.\n" . $e->getMessage( ) );
+            return FALSE;
         }
     }
 
