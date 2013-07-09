@@ -105,6 +105,10 @@ class OWMonitoringReportTest extends ezpTestCase {
             $this->fail('sendReport raise an exception');
         }
     }
+    
+    public function testMakeReport() {
+        self::markTestIncomplete( "Not implemented" );
+    }
 
 }
 ?>
