@@ -1,5 +1,5 @@
 <?php
 
-class OWMonitoringLog extends eZPersistentObject {
+class myScriptMonitoringLog extends OWMonitoringLog {
     
 }
