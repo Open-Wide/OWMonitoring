@@ -34,13 +34,10 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
         }
         $reportDataPrefix = $this->reportDataPrefix . '.' . $report->getIdentifier( );
         $dataList = $report->getDatas( );
-        foreach( $dataList as $name => $value ) {
-            if( is_array( $value ) ) {
-                foreach( $value as $valueItem ) {
-                    $this->sender->addData( $this->hostname, $reportDataPrefix . '.' . $name, $valueItem );
-                }
-            } else {
-                $this->sender->addData( $this->hostname, $reportDataPrefix . '.' . $name, $value );
+        foreach( $dataList as $name => $valueArray ) {
+            foreach( $valueArray as $valueItem ) {
+                $clock = isset( $valueItem['clock'] ) ? $valueItem['clock'] : NULL;
+                $this->sender->addData( $this->hostname, $reportDataPrefix . '.' . $name, $valueItem['data'], $clock );
             }
         }
         try {

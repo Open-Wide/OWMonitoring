@@ -23,29 +23,45 @@ class OWMonitoringReport {
 
     public function getData( $name ) {
         if( $this->hasData( $name ) ) {
-            return $this->reportData[$name];
+            if( count( $this->reportData[$name] ) == 1 ) {
+                return $this->reportData[$name][0];
+            } else {
+                return $this->reportData[$name];
+            }
         }
         return NULL;
     }
 
-    public function setData( $name, $data ) {
+    public function setData( $name, $data, $clock = null ) {
         if( !is_string( $name ) ) {
             return FALSE;
         }
-        $this->reportData[$name] = $data;
+        if( !is_array( $data ) ) {
+            $data = array( $data );
+        }
+        $newData = array( );
+        foreach( $data as $dataItem ) {
+            $newDataItem = array( 'data' => $dataItem );
+            if( $clock ) {
+                $newDataItem['clock'] = $clock;
+            }
+            $newData[] = $newDataItem;
+        }
+
+        $this->reportData[$name] = $newData;
+
         return TRUE;
     }
 
-    public function appendToData( $name, $data ) {
+    public function appendToData( $name, $data, $clock = null ) {
         if( $this->hasData( $name ) ) {
-            $currentData = $this->getData( $name );
-            if( !is_array( $currentData ) ) {
-                $currentData = array( $currentData );
-            }
-            $currentData[] = $data;
-            $this->setData( $name, $currentData );
+            $currentData = $this->reportData[$name];
+            $this->setData( $name, $data, $clock );
+            $newData = $this->reportData[$name];
+            $data = array_merge( $currentData, $newData );
+            $this->reportData[$name] = $data;
         } else {
-            $this->setData( $name, $data );
+            $this->setData( $name, $data, $clock );
         }
     }
 
@@ -63,9 +79,9 @@ class OWMonitoringReport {
         return count( $this->reportData );
     }
 
-    public function setDatas( $dataArray ) {
+    public function setDatas( $dataArray, $clock = null ) {
         foreach( $dataArray as $name => $data ) {
-            $this->setData( $name, $data );
+            $this->setData( $name, $data, $clock );
         }
     }
 
