@@ -3,7 +3,8 @@
 [CronjobSettings]
 ExtensionDirectories[]=owmonitoring
 
-[CronjobPart-owmonitoring_sendreport]
-Scripts[]=owmonitoring_sendreport.php
+[CronjobPart-owmonitoring_sendreports]
+Scripts[]
+Scripts[]=owmonitoring_sendreports.php
 
 */ ?>
