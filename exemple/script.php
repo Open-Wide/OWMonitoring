@@ -14,7 +14,7 @@ $script->startup( );
 $sys = eZSys::instance( );
 $script->initialize( );
 try {
-    $report = new OWMonitoringReport( 'import.company' );
+    $report = new OWMonitoringReport( 'ezpublish.import.company' );
     $report->setData( 'create', intval( rand( 1, 60 ) ) );
     $report->appendToData( 'create', intval( rand( 1, 60 ) ) );
     $report->setData( 'time_import', intval( rand( 20, 40 ) ) );

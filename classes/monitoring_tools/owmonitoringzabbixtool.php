@@ -7,7 +7,6 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
     protected $checkINI = FALSE;
     protected $serverName;
     protected $serverPort;
-    protected $reportDataPrefix;
     protected $hostname;
 
     static function instance( ) {
@@ -32,14 +31,13 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             OWMonitoringLogger::writeError( "Report " . $report->getIdentifier( ) . " can not be sent to Zabbix. Bad configuration." );
             return FALSE;
         }
-        $reportDataPrefix = $this->reportDataPrefix . '.' . $report->getIdentifier( );
         $dataList = $report->getDatas( );
         $dataIDList = array( );
         foreach( $dataList as $name => $valueArray ) {
             foreach( $valueArray as $valueItem ) {
                 $clock = isset( $valueItem['clock'] ) ? $valueItem['clock'] : NULL;
-                $this->sender->addData( $this->hostname, $reportDataPrefix . '.' . $name, $valueItem['data'], $clock );
-                $dataIDList[] = $reportDataPrefix . '.' . $name;
+                $this->sender->addData( $this->hostname, $report->getIdentifier( ) . '.' . $name, $valueItem['data'], $clock );
+                $dataIDList[] = $report->getIdentifier( ) . '.' . $name;
             }
         }
         try {
@@ -97,17 +95,6 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             if( empty( $this->serverPort ) ) {
                 OWMonitoringLogger::writeNotice( "[Zabbix]serverPort is empty. Use default port 10051." );
                 $this->serverPort = 10051;
-            }
-        }
-
-        if( !$toolINI->hasVariable( 'Zabbix', 'ReportDataPrefix' ) ) {
-            OWMonitoringLogger::writeError( "[Zabbix]ReportDataPrefix not defined in owmonitoringtool.ini" );
-            $this->checkINI = FALSE;
-        } else {
-            $this->reportDataPrefix = $toolINI->variable( 'Zabbix', 'ReportDataPrefix' );
-            if( empty( $this->reportDataPrefix ) ) {
-                OWMonitoringLogger::writeError( "[Zabbix]ReportDataPrefix is empty" );
-                $this->checkINI = FALSE;
             }
         }
 
