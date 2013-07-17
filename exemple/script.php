@@ -23,9 +23,14 @@ try {
 } catch(Exception $e) {
     echo $e->getMessage( ) . PHP_EOL;
 }
-
 try {
     $report = OWMonitoringReport::makeReport( 'DatabaseIntegrity' );
+    $report->sendReport( );
+} catch(Exception $e) {
+    echo $e->getMessage( ) . PHP_EOL;
+}
+try {
+    $report = OWMonitoringReport::makeReport( 'eZInfo' );
     $report->sendReport( );
 } catch(Exception $e) {
     echo $e->getMessage( ) . PHP_EOL;
