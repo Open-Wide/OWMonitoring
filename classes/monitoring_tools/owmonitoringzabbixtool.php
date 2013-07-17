@@ -34,10 +34,12 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
         }
         $reportDataPrefix = $this->reportDataPrefix . '.' . $report->getIdentifier( );
         $dataList = $report->getDatas( );
+        $dataIDList = array( );
         foreach( $dataList as $name => $valueArray ) {
             foreach( $valueArray as $valueItem ) {
                 $clock = isset( $valueItem['clock'] ) ? $valueItem['clock'] : NULL;
                 $this->sender->addData( $this->hostname, $reportDataPrefix . '.' . $name, $valueItem['data'], $clock );
+                $dataIDList[] = $reportDataPrefix . '.' . $name;
             }
         }
         try {
@@ -53,7 +55,8 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             $resultLog .= sprintf( ">> parsedInfo: processed = %d\n", $processed );
             $resultLog .= sprintf( ">> parsedInfo: failed    = %d\n", $failed );
             $resultLog .= sprintf( ">> parsedInfo: total     = %d\n", $total );
-            $resultLog .= sprintf( ">> parsedInfo: spent     = %f sec", $spent );
+            $resultLog .= sprintf( ">> parsedInfo: spent     = %f sec\n", $spent );
+            $resultLog .= sprintf( ">> Send data list        = %s\n", implode( ', ', $dataIDList ) );
             if( $failed == 0 ) {
                 OWMonitoringLogger::writeNotice( $report->getIdentifier( ) . " report has been successfully sent to Zabbix.\n" . $resultLog );
                 return TRUE;
