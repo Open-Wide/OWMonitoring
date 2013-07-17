@@ -88,12 +88,12 @@ class OWMonitoringReport {
     public function sendReport( ) {
         $INI = eZINI::instance( 'owmonitoring.ini' );
         if( !$INI->hasVariable( 'OWMonitoring', 'MonitoringToolClass' ) ) {
-            OWMonitoringLogger::writeError( __METHOD__ . " : [OWMonitoring]MonitoringToolClass not defined in owmonitoring.ini" );
+            OWMonitoringLogger::logError( __METHOD__ . " : [OWMonitoring]MonitoringToolClass not defined in owmonitoring.ini" );
             return FALSE;
         }
         $monitoringToolClass = $INI->variable( 'OWMonitoring', 'MonitoringToolClass' );
         if( !class_exists( $monitoringToolClass ) ) {
-            OWMonitoringLogger::writeError( __METHOD__ . " : Class $monitoringToolClass not found" );
+            OWMonitoringLogger::logError( __METHOD__ . " : Class $monitoringToolClass not found" );
             return FALSE;
         }
         $tool = $monitoringToolClass::instance( );
@@ -123,16 +123,16 @@ class OWMonitoringReport {
             $testMethod = 'test' . $testMethod;
             $testFunction = $testClass . '::' . $testMethod;
             if( !class_exists( $testClass ) ) {
-                OWMonitoringLogger::writeError( __METHOD__ . " : Class $testClass not found" );
+                OWMonitoringLogger::logError( __METHOD__ . " : Class $testClass not found" );
                 continue;
             } elseif( !is_callable( $testFunction ) ) {
-                OWMonitoringLogger::writeError( __METHOD__ . " : Can not call $testFunction method" );
+                OWMonitoringLogger::logError( __METHOD__ . " : Can not call $testFunction method" );
                 continue;
             } else {
                 try {
                     $testValue = call_user_func( $testFunction );
                 } catch (  Exception $e ) {
-                    OWMonitoringLogger::writeError( __METHOD__ . " : " . $e->getMessage( ) );
+                    OWMonitoringLogger::logError( __METHOD__ . " : " . $e->getMessage( ) );
                     $testValue = FALSE;
                 }
                 $report->setData( $testIdentifier, $testValue );

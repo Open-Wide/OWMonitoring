@@ -28,7 +28,7 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
 
     public function sendReport( OWMonitoringReport $report ) {
         if( !$this->checkINI ) {
-            OWMonitoringLogger::writeError( "Report " . $report->getIdentifier( ) . " can not be sent to Zabbix. Bad configuration." );
+            OWMonitoringLogger::logError( "Report " . $report->getIdentifier( ) . " can not be sent to Zabbix. Bad configuration." );
             return FALSE;
         }
         $dataList = $report->getDatas( );
@@ -56,14 +56,14 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             $resultLog .= sprintf( ">> parsedInfo: spent     = %f sec\n", $spent );
             $resultLog .= sprintf( ">> Send data list        = %s\n", implode( ', ', $dataIDList ) );
             if( $failed == 0 ) {
-                OWMonitoringLogger::writeNotice( $report->getIdentifier( ) . " report has been successfully sent to Zabbix.\n" . $resultLog );
+                OWMonitoringLogger::logNotice( $report->getIdentifier( ) . " report has been successfully sent to Zabbix.\n" . $resultLog );
                 return TRUE;
             } else {
-                OWMonitoringLogger::writeWarning( $report->getIdentifier( ) . " report has been successfully sent to Zabbix but some data failed.\n" . $resultLog );
+                OWMonitoringLogger::logWarning( $report->getIdentifier( ) . " report has been successfully sent to Zabbix but some data failed.\n" . $resultLog );
                 return TRUE;
             }
         } catch( Exception $e ) {
-            OWMonitoringLogger::writeNotice( "Report " . $report->getIdentifier( ) . " can not be sent to Zabbix.\n" . $e->getMessage( ) );
+            OWMonitoringLogger::logError( "Report " . $report->getIdentifier( ) . " can not be sent to Zabbix.\n" . $e->getMessage( ) );
             return FALSE;
         }
     }
@@ -77,34 +77,34 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
         $this->checkINI = TRUE;
 
         if( !$toolINI->hasVariable( 'Zabbix', 'ServerName' ) ) {
-            OWMonitoringLogger::writeError( "[Zabbix]ServerName not defined in owmonitoringtool.ini" );
+            OWMonitoringLogger::logError( "[Zabbix]ServerName not defined in owmonitoringtool.ini" );
             $this->checkINI = FALSE;
         } else {
             $this->serverName = $toolINI->variable( 'Zabbix', 'ServerName' );
             if( empty( $this->serverName ) ) {
-                OWMonitoringLogger::writeError( "[Zabbix]ServerName is empty" );
+                OWMonitoringLogger::logError( "[Zabbix]ServerName is empty" );
                 $this->checkINI = FALSE;
             }
         }
 
         if( !$toolINI->hasVariable( 'Zabbix', 'ServerPort' ) ) {
-            OWMonitoringLogger::writeError( "[Zabbix]ServerPort not defined in owmonitoringtool.ini" );
+            OWMonitoringLogger::logError( "[Zabbix]ServerPort not defined in owmonitoringtool.ini" );
             $this->checkINI = FALSE;
         } else {
             $this->serverPort = $toolINI->variable( 'Zabbix', 'ServerPort' );
             if( empty( $this->serverPort ) ) {
-                OWMonitoringLogger::writeNotice( "[Zabbix]serverPort is empty. Use default port 10051." );
+                OWMonitoringLogger::logNotice( "[Zabbix]serverPort is empty. Use default port 10051." );
                 $this->serverPort = 10051;
             }
         }
 
         if( !$toolINI->hasVariable( 'Zabbix', 'Hostname' ) ) {
-            OWMonitoringLogger::writeError( "[Zabbix]Hostname not defined in owmonitoringtool.ini" );
+            OWMonitoringLogger::logError( "[Zabbix]Hostname not defined in owmonitoringtool.ini" );
             $this->checkINI = FALSE;
         } else {
             $this->hostname = $toolINI->variable( 'Zabbix', 'Hostname' );
             if( empty( $this->hostname ) ) {
-                OWMonitoringLogger::writeError( "[Zabbix]Hostname is empty" );
+                OWMonitoringLogger::logError( "[Zabbix]Hostname is empty" );
                 $this->checkINI = FALSE;
             }
         }
