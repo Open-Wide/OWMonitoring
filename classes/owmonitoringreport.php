@@ -9,7 +9,7 @@ class OWMonitoringReport extends eZPersistentObject {
 
     public function __construct( $identifier ) {
         if( empty( $identifier ) ) {
-            throw new Exception( __METHOD__ . " : Report identifier must be set" );
+            throw new OWMonitoringReportException( __METHOD__ . " : Report identifier must be set" );
         }
         $this->identifier = $identifier;
         $this->reportData = array( );
@@ -110,7 +110,7 @@ class OWMonitoringReport extends eZPersistentObject {
         if( $INI->hasVariable( $reportName, 'Identifier' ) ) {
             $identifier = $INI->variable( $reportName, 'Identifier' );
         } else {
-            throw new Exception( __METHOD__ . " : [$reportName]Identifier not defined in owmonitoring.ini" );
+            throw new OWMonitoringReportException( __METHOD__ . " : [$reportName]Identifier not defined in owmonitoring.ini" );
         }
         if( $INI->hasVariable( $reportName, 'PrepareFrequency' ) ) {
             $prepareFrequency = $INI->variable( $reportName, 'PrepareFrequency' );
@@ -148,11 +148,11 @@ class OWMonitoringReport extends eZPersistentObject {
                     $toDate = $date->format( 'Y-m-01 00:00:00' );
                     break;
                 default :
-                    throw new Exception( __METHOD__ . " : bad frequency" );
+                    throw new OWMonitoringReportException( __METHOD__ . " : bad frequency" );
                     break;
             }
             if( self::fetchCount( $identifier, $fromDate, $toDate ) > 0 ) {
-                throw new Exception( __METHOD__ . " : $reportName already exits" );
+                throw new OWMonitoringReportException( __METHOD__ . " : $reportName already exits" );
             }
             $report = self::makeReport( $reportName, TRUE );
             $report->store();
@@ -164,17 +164,17 @@ class OWMonitoringReport extends eZPersistentObject {
         if( $INI->hasVariable( $reportName, 'Identifier' ) ) {
             $identifier = $INI->variable( $reportName, 'Identifier' );
         } else {
-            throw new Exception( __METHOD__ . " : [$reportName]Identifier not defined in owmonitoring.ini" );
+            throw new OWMonitoringReportException( __METHOD__ . " : [$reportName]Identifier not defined in owmonitoring.ini" );
         }
         if( $INI->hasVariable( $reportName, 'Tests' ) ) {
             $testList = $INI->variable( $reportName, 'Tests' );
         } else {
-            throw new Exception( __METHOD__ . " : [$reportName]Tests not defined in owmonitoring.ini" );
+            throw new OWMonitoringReportException( __METHOD__ . " : [$reportName]Tests not defined in owmonitoring.ini" );
         }
         try {
             $report = new OWMonitoringReport( $identifier );
         } catch( Exception $e ) {
-            throw new Exception( __METHOD__ . " : Report instancation failed\n" . $e->getMessage( ) );
+            throw new OWMonitoringReportException( __METHOD__ . " : Report instancation failed\n" . $e->getMessage( ) );
         }
         if( $forceClock === TRUE ) {
             $forceClock = time( );
@@ -201,7 +201,7 @@ class OWMonitoringReport extends eZPersistentObject {
             }
         }
         if( $report->countDatas( ) == 0 ) {
-            throw new Exception( __METHOD__ . " : Report is empty" );
+            throw new OWMonitoringReportException( __METHOD__ . " : Report is empty" );
         }
         return $report;
     }

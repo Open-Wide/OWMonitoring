@@ -25,7 +25,7 @@ class OWMonitoringReportTest extends ezpDatabaseTestCase {
     public function tearDown( ) {
         parent::tearDown( );
     }
-    
+
     public function testfetchCount( ) {
         $this->assertEquals( OWMonitoringReport::fetchCount( ), 20 );
 
@@ -182,13 +182,19 @@ class OWMonitoringReportTest extends ezpDatabaseTestCase {
     }
 
     public function testPrepareReport( ) {
-        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute' ), 4 );
-        $report = OWMonitoringReport::prepareReport( 'OWMonitoringUnitTestMinute' );
-        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute' ), 4 );
-        
         $this->assertEquals( OWMonitoringReport::fetchCount( 'test.weekly' ), 2 );
         $report = OWMonitoringReport::prepareReport( 'OWMonitoringUnitTestWeekly' );
         $this->assertEquals( OWMonitoringReport::fetchCount( 'test.weekly' ), 3 );
+    }
+    
+    /**
+     * @expectedException OWMonitoringReportException
+     */
+    public function testPrepareReportAlreadyExists( ) {
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute' ), 4 );
+        $report = OWMonitoringReport::prepareReport( 'OWMonitoringUnitTestMinute' );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute' ), 4 );
+
     }
 
 }
