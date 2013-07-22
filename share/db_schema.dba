@@ -1,0 +1,34 @@
+<?php
+// This array contains the database schema
+$schema = array (
+  'owmonitoring_report' =>
+  array (
+    'name' => 'owmonitoring_report',
+    'fields' =>
+    array (
+      'name' =>
+      array (
+        'length' => 100,
+        'type' => 'varchar',
+        'default' => false,
+      ),
+      'date' =>
+      array (
+        'type' => 'datetime',
+        'default' => 'NOW()',
+      ),
+      'serialized_data' =>
+      array (
+        'type' => 'longtext',
+        'default' => false,
+      )
+    ),
+    'indexes' => array(),
+  ),
+  '_info' =>
+  array (
+    'format' => 'generic',
+  ),
+);
+
+?>

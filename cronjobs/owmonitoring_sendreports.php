@@ -1,8 +1,8 @@
 <?php
 
 $INI = eZINI::instance( 'owmonitoring.ini' );
-if( $INI->hasVariable( 'OWMonitoring', 'ActiveReports' ) ) {
-    $activeReports = $INI->variable( 'OWMonitoring', 'ActiveReports' );
+if( $INI->hasVariable( 'OWMonitoring', 'SendActiveReports' ) ) {
+    $activeReports = $INI->variable( 'OWMonitoring', 'SendActiveReports' );
     foreach( $activeReports as $report ) {
         try {
             $report = OWMonitoringReport::makeReport( $report );

@@ -1,9 +1,11 @@
 <?php
 
-class OWMonitoringReport {
+class OWMonitoringReport extends eZPersistentObject {
 
     protected $identifier;
     protected $reportData;
+    protected $date;
+    protected $serialized_data;
 
     public function __construct( $identifier ) {
         if( empty( $identifier ) ) {
@@ -11,6 +13,9 @@ class OWMonitoringReport {
         }
         $this->identifier = $identifier;
         $this->reportData = array( );
+        if( !empty( $this->serialized_data ) ) {
+            $this->reportData = unserialize( $this->attribute( 'serialized_data' ) );
+        }
     }
 
     public function getIdentifier( ) {
@@ -100,7 +105,61 @@ class OWMonitoringReport {
         return $tool->sendReport( $this );
     }
 
-    static function makeReport( $reportName ) {
+    static function prepareReport( $reportName ) {
+        $INI = eZINI::instance( 'owmonitoring.ini' );
+        if( $INI->hasVariable( $reportName, 'Identifier' ) ) {
+            $identifier = $INI->variable( $reportName, 'Identifier' );
+        } else {
+            throw new Exception( __METHOD__ . " : [$reportName]Identifier not defined in owmonitoring.ini" );
+        }
+        if( $INI->hasVariable( $reportName, 'PrepareFrequency' ) ) {
+            $prepareFrequency = $INI->variable( $reportName, 'PrepareFrequency' );
+            $date = new DateTime( );
+            switch( $prepareFrequency ) {
+                case 'minute' :
+                    $fromDate = $date->format( 'Y-m-d H:i:00' );
+                    $date->modify( '+1 minute' );
+                    $toDate = $date->format( 'Y-m-d H:i:00' );
+                    break;
+                case 'quarter_hour' :
+                    $quarter = intval( $date->format( 'i' ) / 15 );
+                    $fromDate = $date->format( 'Y-m-d H:' . (15 * $quarter) . ':00' );
+                    $quarter++;
+                    $toDate = $date->format( 'Y-m-d H:' . (15 * $quarter) . ':00' );
+                    break;
+                case 'houly' :
+                    $fromDate = $date->format( 'Y-m-d H:00:00' );
+                    $date->modify( '+1 hour' );
+                    $toDate = $date->format( 'Y-m-d H:00:00' );
+                    break;
+                case 'daily' :
+                    $fromDate = $date->format( 'Y-m-d 00:00:00' );
+                    $date->modify( '+1 day' );
+                    $toDate = $date->format( 'Y-m-d 00:00:00' );
+                    break;
+                case 'weekly' :
+                    $fromDate = $date->format( 'Y-m-d 00:00:00' );
+                    $date->modify( '+1 week' );
+                    $toDate = $date->format( 'Y-m-d 00:00:00' );
+                    break;
+                case 'monthly' :
+                    $fromDate = $date->format( 'Y-m-01 00:00:00' );
+                    $date->modify( '+1 month' );
+                    $toDate = $date->format( 'Y-m-01 00:00:00' );
+                    break;
+                default :
+                    throw new Exception( __METHOD__ . " : bad frequency" );
+                    break;
+            }
+            if( self::fetchCount( $identifier, $fromDate, $toDate ) > 0 ) {
+                throw new Exception( __METHOD__ . " : $reportName already exits" );
+            }
+            $report = self::makeReport( $reportName, TRUE );
+            $report->store();
+        }
+    }
+
+    static function makeReport( $reportName, $forceClock = NULL ) {
         $INI = eZINI::instance( 'owmonitoring.ini' );
         if( $INI->hasVariable( $reportName, 'Identifier' ) ) {
             $identifier = $INI->variable( $reportName, 'Identifier' );
@@ -116,6 +175,9 @@ class OWMonitoringReport {
             $report = new OWMonitoringReport( $identifier );
         } catch( Exception $e ) {
             throw new Exception( __METHOD__ . " : Report instancation failed\n" . $e->getMessage( ) );
+        }
+        if( $forceClock === TRUE ) {
+            $forceClock = time( );
         }
         foreach( $testList as $testIdentifier => $testFunction ) {
             list( $testClass, $testMethod ) = explode( '::', $testFunction );
@@ -135,13 +197,85 @@ class OWMonitoringReport {
                     OWMonitoringLogger::logError( __METHOD__ . " : " . $e->getMessage( ) );
                     $testValue = FALSE;
                 }
-                $report->setData( $testIdentifier, $testValue );
+                $report->setData( $testIdentifier, $testValue, $forceClock );
             }
         }
         if( $report->countDatas( ) == 0 ) {
             throw new Exception( __METHOD__ . " : Report is empty" );
         }
         return $report;
+    }
+
+    /* eZPersistentObject methods */
+
+    public static function definition( ) {
+        return array(
+            'fields' => array(
+                'identifier' => array(
+                    'name' => 'identifier',
+                    'datatype' => 'string',
+                    'default' => null,
+                    'required' => true
+                ),
+                'date' => array(
+                    'name' => 'date',
+                    'datatype' => 'string',
+                    'default' => null,
+                    'required' => true
+                ),
+                'serialized_data' => array(
+                    'name' => 'serialized_data',
+                    'datatype' => 'text',
+                    'default' => null,
+                    'required' => true
+                )
+            ),
+            'keys' => array(
+                'identifier',
+                'date'
+            ),
+            'class_name' => 'OWMonitoringReport',
+            'name' => 'owmonitoring_report',
+            'function_attributes' => array( ),
+            'set_functions' => array( )
+        );
+    }
+
+    function store( $fieldFilters = NULL ) {
+        $this->setAttribute( 'serialized_data', serialize( $this->reportData ) );
+        $this->setAttribute( 'date', date( 'Y-m-d H:i:s' ) );
+        parent::store( $fieldFilters );
+    }
+
+    static function fetch( $identifier, $fromDate = NULL, $toDate = NULL ) {
+        $rows = self::fetchList( $identifier, $fromDate, $toDate, 1 );
+        if( $rows )
+            return $rows[0];
+        return null;
+    }
+
+    static function fetchList( $identifier = NULL, $fromDate = NULL, $toDate = NULL, $limit = NULL ) {
+        $conds = array( );
+        if( $identifier ) {
+            $conds[] = "identifier LIKE '$identifier'";
+        }
+        if( $fromDate ) {
+            $conds[] = "date >= '$fromDate'";
+        }
+        if( $toDate ) {
+            $conds[] = "date < '$toDate'";
+        }
+        if( !empty( $conds ) ) {
+            $conds = ' WHERE ' . implode( ' AND ', $conds );
+        }
+        return self::fetchObjectList( self::definition( ), null, null, array(
+            'identifier' => 'asc',
+            'date' => 'asc'
+        ), $limit, true, false, null, null, $conds );
+    }
+
+    static function fetchCount( $identifier = NULL, $fromDate = NULL, $toDate = NULL ) {
+        return count( self::fetchList( $identifier, $fromDate, $toDate ) );
     }
 
 }

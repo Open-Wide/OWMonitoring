@@ -1,6 +1,7 @@
 <?php
 
 class OWMonitoringReportTest extends ezpDatabaseTestCase {
+
     public function __construct( ) {
         parent::__construct( );
         $this->setName( "OWMonitoringReport Unit Tests" );
@@ -8,10 +9,40 @@ class OWMonitoringReportTest extends ezpDatabaseTestCase {
 
     public function setUp( ) {
         parent::setUp( );
+        $ini = eZINI::instance( 'owmonitoring.ini' );
+        $ini->setVariables( array( 'OWMonitoringUnitTestMinute' => array(
+                'Identifier' => 'test.minute',
+                'PrepareFrequency' => 'minute',
+                'Tests' => array( 'unit.test1' => 'UnitTest::UnitTest1' )
+            ) ) );
+        $ini->setVariables( array( 'OWMonitoringUnitTestWeekly' => array(
+                'Identifier' => 'test.weekly',
+                'PrepareFrequency' => 'weekly',
+                'Tests' => array( 'unit.test1' => 'UnitTest::UnitTest1' )
+            ) ) );
     }
 
     public function tearDown( ) {
         parent::tearDown( );
+    }
+    
+    public function testfetchCount( ) {
+        $this->assertEquals( OWMonitoringReport::fetchCount( ), 20 );
+
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute' ), 4 );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute', '2013-07-17 12:30:59' ), 2 );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute', '2013-07-17 12:19:00', '2013-07-17 12:20:00' ), 0 );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute', '2013-07-17 12:20:00', '2013-07-17 12:21:00' ), 1 );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute', '2013-07-17 12:30:00', '2013-07-17 12:31:00' ), 1 );
+
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.quarter_hour' ), 5 );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.quarter_hour', '2013-07-17 00:30:00' ), 3 );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.quarter_hour', '2013-07-17 00:00:00', '2013-07-17 00:15:00' ), 1 );
+
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.quarter_hour' ), 5 );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.quarter_hour', '2013-07-17 00:30:00' ), 3 );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.quarter_hour', '2013-07-17 00:00:00', '2013-07-17 00:15:00' ), 1 );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.quarter_hour', '2013-07-17 01:00:00', '2013-07-17 01:15:00' ), 0 );
     }
 
     public function test__constructSansIndentifient( ) {
@@ -142,15 +173,22 @@ class OWMonitoringReportTest extends ezpDatabaseTestCase {
             'test' => 'test',
             'test_2' => 'test_2'
         ) );
-        try {
-            $this->assertEquals( $report->sendReport( ), FALSE );
-        } catch (Exception $e) {
-            $this->fail( 'sendReport raise an exception' );
-        }
+        $this->assertEquals( $report->sendReport( ), TRUE );
     }
 
     public function testMakeReport( ) {
-        self::markTestIncomplete( "Not implemented" );
+        $report = OWMonitoringReport::makeReport( 'OWMonitoringUnitTestMinute' );
+        $this->assertEquals( $report->countDatas( ), 1 );
+    }
+
+    public function testPrepareReport( ) {
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute' ), 4 );
+        $report = OWMonitoringReport::prepareReport( 'OWMonitoringUnitTestMinute' );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.minute' ), 4 );
+        
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.weekly' ), 2 );
+        $report = OWMonitoringReport::prepareReport( 'OWMonitoringUnitTestWeekly' );
+        $this->assertEquals( OWMonitoringReport::fetchCount( 'test.weekly' ), 3 );
     }
 
 }

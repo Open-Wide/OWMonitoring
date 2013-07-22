@@ -3,6 +3,9 @@
 require_once 'tests/owmonitoringreport_test.php';
 
 class OWMonitiringTestSuite extends ezpDatabaseTestSuite {
+    
+    protected $sqlFiles = array( 'extension/owmonitoring/tests/fixtures/owmonitoringreport.sql' );
+    
     public function __construct( ) {
         parent::__construct( );
         $this->insertDefaultData = false;
