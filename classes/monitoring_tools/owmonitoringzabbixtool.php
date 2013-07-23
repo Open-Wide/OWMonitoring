@@ -55,17 +55,30 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             $resultLog .= sprintf( ">> parsedInfo: total     = %d\n", $total );
             $resultLog .= sprintf( ">> parsedInfo: spent     = %f sec\n", $spent );
             $resultLog .= sprintf( ">> Send data list        = %s\n", implode( ', ', $dataIDList ) );
+            $resultArray = array(
+                'request_result' => $data['response'],
+                'processed' => $processed,
+                'failed' => $failed,
+                'total' => $total
+            );
             if( $failed == 0 ) {
                 OWMonitoringLogger::logNotice( $report->getIdentifier( ) . " report has been successfully sent to Zabbix.\n" . $resultLog );
-                return TRUE;
+                $resultArray['status'] = self::SENDING_SUCCESSFUL;
             } else {
                 OWMonitoringLogger::logWarning( $report->getIdentifier( ) . " report has been successfully sent to Zabbix but some data failed.\n" . $resultLog );
-                return TRUE;
+                $resultArray['status'] = self::SENDING_INCOMPLETE;
             }
         } catch( Exception $e ) {
             OWMonitoringLogger::logError( "Report " . $report->getIdentifier( ) . " can not be sent to Zabbix.\n" . $e->getMessage( ) );
-            return FALSE;
+            return array(
+                'request_result' => $e->getMessage( ),
+                'processed' => 0,
+                'failed' => $report->countDatas( ),
+                'total' => $report->countDatas( ),
+                'status' => self::SENDING_FAILED
+            );
         }
+        return $resultArray;
     }
 
     public function sendAlert( ) {

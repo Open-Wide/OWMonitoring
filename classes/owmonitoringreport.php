@@ -6,13 +6,24 @@ class OWMonitoringReport extends eZPersistentObject {
     protected $reportData;
     protected $date;
     protected $serialized_data;
+    
+    protected $request_result;
+    protected $processed;
+    protected $failed;
+    protected $total;
+    protected $status;
+    protected $last_sending;
 
-    public function __construct( $identifier ) {
-        if( empty( $identifier ) ) {
-            throw new OWMonitoringReportException( __METHOD__ . " : Report identifier must be set" );
+    public function __construct( $identifier_or_row ) {
+        if( is_array( $identifier_or_row ) ) {
+            parent::__construct( $identifier_or_row );
+        } else {
+            if( empty( $identifier_or_row ) ) {
+                throw new OWMonitoringReportException( __METHOD__ . " : Report identifier must be set" );
+            }
+            $this->identifier = $identifier_or_row;
+            $this->reportData = array( );
         }
-        $this->identifier = $identifier;
-        $this->reportData = array( );
         if( !empty( $this->serialized_data ) ) {
             $this->reportData = unserialize( $this->attribute( 'serialized_data' ) );
         }
@@ -102,7 +113,22 @@ class OWMonitoringReport extends eZPersistentObject {
             return FALSE;
         }
         $tool = $monitoringToolClass::instance( );
-        return $tool->sendReport( $this );
+        $sendingResult = $tool->sendReport( $this );
+        switch ($sendingResult['status']) {
+            case OWMonitoringTool::SENDING_SUCCESSFUL :
+                $this->remove( );
+                break;
+            default :
+                $this->setAttribute( 'request_result', $sendingResult['request_result'] );
+                $this->setAttribute( 'processed', $sendingResult['processed'] );
+                $this->setAttribute( 'failed', $sendingResult['failed'] );
+                $this->setAttribute( 'total', $sendingResult['total'] );
+                $this->setAttribute( 'status', $sendingResult['status'] );
+                $this->setAttribute( 'last_sending', date( 'Y-m-d H:i:s' ) );
+                $this->store( );
+                break;
+        }
+        return;
     }
 
     static function prepareReport( $reportName ) {
@@ -155,7 +181,7 @@ class OWMonitoringReport extends eZPersistentObject {
                 throw new OWMonitoringReportException( __METHOD__ . " : $reportName already exits" );
             }
             $report = self::makeReport( $reportName, TRUE );
-            $report->store();
+            $report->store( );
         }
     }
 
@@ -228,7 +254,43 @@ class OWMonitoringReport extends eZPersistentObject {
                     'datatype' => 'text',
                     'default' => null,
                     'required' => true
-                )
+                ),
+                'request_result' => array(
+                    'name' => 'request_result',
+                    'datatype' => 'string',
+                    'default' => null,
+                    'required' => false
+                ),
+                'processed' => array(
+                    'name' => 'processed',
+                    'datatype' => 'integer',
+                    'default' => null,
+                    'required' => false
+                ),
+                'failed' => array(
+                    'name' => 'failed',
+                    'datatype' => 'integer',
+                    'default' => null,
+                    'required' => false
+                ),
+                'total' => array(
+                    'name' => 'total',
+                    'datatype' => 'integer',
+                    'default' => null,
+                    'required' => false
+                ),
+                'status' => array(
+                    'name' => 'status',
+                    'datatype' => 'integer',
+                    'default' => null,
+                    'required' => false
+                ),
+                'last_sending' => array(
+                    'name' => 'last_sending',
+                    'datatype' => 'string',
+                    'default' => null,
+                    'required' => false
+                ),
             ),
             'keys' => array(
                 'identifier',
@@ -243,13 +305,15 @@ class OWMonitoringReport extends eZPersistentObject {
 
     function store( $fieldFilters = NULL ) {
         $this->setAttribute( 'serialized_data', serialize( $this->reportData ) );
-        $this->setAttribute( 'date', date( 'Y-m-d H:i:s' ) );
+        if( $this->attribute( 'date' ) == NULL ) {
+            $this->setAttribute( 'date', date( 'Y-m-d H:i:s' ) );
+        }
         parent::store( $fieldFilters );
     }
 
     static function fetch( $identifier, $fromDate = NULL, $toDate = NULL ) {
         $rows = self::fetchList( $identifier, $fromDate, $toDate, 1 );
-        if( $rows )
+        if( isset( $rows[0] ) )
             return $rows[0];
         return null;
     }

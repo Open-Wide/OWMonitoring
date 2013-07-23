@@ -1,34 +1,54 @@
 <?php
 // This array contains the database schema
-$schema = array (
-  'owmonitoring_report' =>
-  array (
-    'name' => 'owmonitoring_report',
-    'fields' =>
-    array (
-      'name' =>
-      array (
-        'length' => 100,
-        'type' => 'varchar',
-        'default' => false,
-      ),
-      'date' =>
-      array (
-        'type' => 'datetime',
-        'default' => 'NOW()',
-      ),
-      'serialized_data' =>
-      array (
-        'type' => 'longtext',
-        'default' => false,
-      )
+$schema = array(
+    'owmonitoring_report' => array(
+        'name' => 'owmonitoring_report',
+        'fields' => array(
+            'identifier' => array(
+                'length' => 100,
+                'type' => 'varchar',
+                'default' => false,
+            ),
+            'date' => array(
+                'type' => 'datetime',
+                'default' => false,
+            ),
+            'serialized_data' => array(
+                'type' => 'longtext',
+                'default' => false,
+            ),
+            'request_result' => array(
+                'length' => 100,
+                'type' => 'varchar',
+                'default' => null,
+            ),
+            'processed' => array(
+                'length' => 11,
+                'type' => 'int',
+                'default' => null,
+            ),
+            'failed' => array(
+                'length' => 11,
+                'type' => 'int',
+                'default' => null,
+            ),
+            'total' => array(
+                'length' => 11,
+                'type' => 'int',
+                'default' => null,
+            ),
+            'status' => array(
+                'length' => 11,
+                'type' => 'int',
+                'default' => null,
+            ),
+            'last_sending' => array(
+                'type' => 'datetime',
+                'default' => null,
+            )
+        ),
+        'indexes' => array( ),
     ),
-    'indexes' => array(),
-  ),
-  '_info' =>
-  array (
-    'format' => 'generic',
-  ),
+    '_info' => array( 'format' => 'generic', ),
 );
-
 ?>
