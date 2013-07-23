@@ -187,10 +187,10 @@ class OWMonitoringReport extends eZPersistentObject {
             if( self::fetchCount( $identifier, $fromDate, $toDate ) > 0 ) {
                 throw new OWMonitoringReportException( __METHOD__ . " : $reportName already exits" );
             }
-            $report = self::makeReport( $reportName, TRUE );
-            $report->store( );
-            OWMonitoringLogger::logNotice( __METHOD__ . " : Report " . $report->getIdentifier( ) . " is stored in the database" );
         }
+        $report = self::makeReport( $reportName, TRUE );
+        $report->store( );
+        OWMonitoringLogger::logNotice( __METHOD__ . " : Report " . $report->getIdentifier( ) . " is stored in the database" );
     }
 
     static function makeReport( $reportName, $forceClock = NULL ) {
