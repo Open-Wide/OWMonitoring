@@ -33,6 +33,12 @@ class OWMonitoringReport extends eZPersistentObject {
         return $this->identifier;
     }
 
+    public function getClock( ) {
+        if( $this->attribute( 'date' ) != NULL ) {
+            return strtotime( $this->attribute( 'date' ) );
+        }
+    }
+
     public function hasData( $name ) {
         return array_key_exists( $name, $this->reportData );
     }
@@ -52,7 +58,7 @@ class OWMonitoringReport extends eZPersistentObject {
         if( !is_string( $name ) ) {
             return FALSE;
         }
-        if( is_array($data) && array_keys( $data ) !== range( 0, count( $data ) - 1 ) ) {
+        if( is_array( $data ) && array_keys( $data ) !== range( 0, count( $data ) - 1 ) ) {
             // associative array
             foreach( $data as $key => $value ) {
                 $this->setData( $name . '.' . $key, $value, $clock );

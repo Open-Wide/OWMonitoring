@@ -32,10 +32,11 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             return FALSE;
         }
         $dataList = $report->getDatas( );
+        $defaultClock = $report->getClock( );
         $dataIDList = array( );
         foreach( $dataList as $name => $valueArray ) {
             foreach( $valueArray as $valueItem ) {
-                $clock = isset( $valueItem['clock'] ) ? $valueItem['clock'] : NULL;
+                $clock = isset( $valueItem['clock'] ) ? $valueItem['clock'] : $defaultClock;
                 $this->sender->addData( $this->hostname, $report->getIdentifier( ) . '.' . $name, $valueItem['data'], $clock );
                 $dataIDList[] = $report->getIdentifier( ) . '.' . $name;
             }
