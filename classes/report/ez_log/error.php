@@ -4,7 +4,13 @@ class eZLogReport_Error extends eZLogReport_BaseAnalyser {
 
     static function testAnalyseLog( ) {
         $analyser = new self( );
-        return $analyser->analyzeLogfile( 'var/log/error.log' );
+        $retult = $analyser->analyzeLogfile( 'var/log/error.log' );
+        $siteData = new eZSiteData( array(
+            'name' => __CLASS__,
+            'value' => date( 'Y-m-d H:i:s' )
+        ) );
+        $siteData->store( );
+        return $retult;
     }
 
     public function __construct( ) {
@@ -14,6 +20,13 @@ class eZLogReport_Error extends eZLogReport_BaseAnalyser {
         }
         if( $INI->hasVariable( 'eZLogReport', 'IgnoredErrorList' ) ) {
             $this->ignoredList = $INI->variable( 'eZLogReport', 'IgnoredErrorList' );
+        }
+        $lastAnalysis = eZSiteData::fetchByName( __CLASS__ );
+        if( $lastAnalysis ) {
+            $this->lastAnalysis = new DateTime( $lastAnalysis->attribute( 'value' ) );
+        }
+        foreach( $this->reportedList as $key => $value ) {
+            $this->report[$key] = 0;
         }
     }
 
