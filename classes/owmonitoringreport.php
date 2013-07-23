@@ -6,7 +6,7 @@ class OWMonitoringReport extends eZPersistentObject {
     protected $reportData;
     protected $date;
     protected $serialized_data;
-    
+
     protected $request_result;
     protected $processed;
     protected $failed;
@@ -52,6 +52,13 @@ class OWMonitoringReport extends eZPersistentObject {
         if( !is_string( $name ) ) {
             return FALSE;
         }
+        if( is_array($data) && array_keys( $data ) !== range( 0, count( $data ) - 1 ) ) {
+            // associative array
+            foreach( $data as $key => $value ) {
+                $this->setData( $name . '.' . $key, $value, $clock );
+            }
+            return TRUE;
+        }
         if( !is_array( $data ) ) {
             $data = array( $data );
         }
@@ -65,7 +72,6 @@ class OWMonitoringReport extends eZPersistentObject {
         }
 
         $this->reportData[$name] = $newData;
-
         return TRUE;
     }
 
@@ -126,6 +132,7 @@ class OWMonitoringReport extends eZPersistentObject {
                 $this->setAttribute( 'status', $sendingResult['status'] );
                 $this->setAttribute( 'last_sending', date( 'Y-m-d H:i:s' ) );
                 $this->store( );
+                OWMonitoringLogger::logNotice( __METHOD__ . " : Report " . $this->getIdentifier( ) . " is stored in the database for next attempt" );
                 break;
         }
         return;
@@ -182,6 +189,7 @@ class OWMonitoringReport extends eZPersistentObject {
             }
             $report = self::makeReport( $reportName, TRUE );
             $report->store( );
+            OWMonitoringLogger::logNotice( __METHOD__ . " : Report " . $report->getIdentifier( ) . " is stored in the database" );
         }
     }
 
