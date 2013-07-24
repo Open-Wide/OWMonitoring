@@ -11,4 +11,8 @@ Scripts[]=owmonitoring_preparereports.php
 Scripts[]
 Scripts[]=owmonitoring_sendreports.php
 
+[CronjobPart-owmonitoring_cleanup]
+Scripts[]
+Scripts[]=owmonitoring_cleanup.php
+
 */ ?>

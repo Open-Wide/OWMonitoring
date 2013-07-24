@@ -153,49 +153,57 @@ class OWMonitoringReport extends eZPersistentObject {
         }
         if( $INI->hasVariable( $reportName, 'PrepareFrequency' ) ) {
             $prepareFrequency = $INI->variable( $reportName, 'PrepareFrequency' );
-            $date = new DateTime( );
             switch( $prepareFrequency ) {
                 case 'minute' :
-                    $fromDate = $date->format( 'Y-m-d H:i:00' );
-                    $date->modify( '+1 minute' );
-                    $toDate = $date->format( 'Y-m-d H:i:00' );
+                    $fromDate = new DateTime( date( 'Y-m-d H:i:00' ) );
+                    $toDate = clone($fromDate);
+                    $toDate->modify( '+1 minute' );
                     break;
                 case 'quarter_hour' :
                     $quarter = intval( $date->format( 'i' ) / 15 );
-                    $fromDate = $date->format( 'Y-m-d H:' . (15 * $quarter) . ':00' );
-                    $quarter++;
-                    $toDate = $date->format( 'Y-m-d H:' . (15 * $quarter) . ':00' );
+                    $fromDate = new DateTime( date( 'Y-m-d H:' . (15 * $quarter) . ':00' ) );
+                    $toDate = clone($fromDate);
+                    $toDate->modify( '+15 minute' );
                     break;
                 case 'houly' :
-                    $fromDate = $date->format( 'Y-m-d H:00:00' );
-                    $date->modify( '+1 hour' );
-                    $toDate = $date->format( 'Y-m-d H:00:00' );
+                    $fromDate = new DateTime( date( 'Y-m-d H:00:00' ) );
+                    $toDate = clone($fromDate);
+                    $toDate->modify( '+1 hour' );
                     break;
                 case 'daily' :
-                    $fromDate = $date->format( 'Y-m-d 00:00:00' );
-                    $date->modify( '+1 day' );
-                    $toDate = $date->format( 'Y-m-d 00:00:00' );
+                    $fromDate = new DateTime( date( 'Y-m-d 00:00:00' ) );
+                    $toDate = clone($fromDate);
+                    $toDate->modify( '+1 day' );
                     break;
                 case 'weekly' :
-                    $fromDate = $date->format( 'Y-m-d 00:00:00' );
-                    $date->modify( '+1 week' );
-                    $toDate = $date->format( 'Y-m-d 00:00:00' );
+                    $fromDate = new DateTime( date( 'Y-m-d 00:00:00' ) );
+                    $toDate = clone($fromDate);
+                    $toDate->modify( '+1 week' );
                     break;
                 case 'monthly' :
-                    $fromDate = $date->format( 'Y-m-01 00:00:00' );
-                    $date->modify( '+1 month' );
-                    $toDate = $date->format( 'Y-m-01 00:00:00' );
+                    $fromDate = new DateTime( date( 'Y-m-01 00:00:00' ) );
+                    $toDate = clone($fromDate);
+                    $toDate->modify( '+1 month' );
                     break;
                 default :
                     throw new OWMonitoringReportException( __METHOD__ . " : bad frequency" );
                     break;
             }
-            if( self::fetchCount( $identifier, $fromDate, $toDate ) > 0 ) {
-                throw new OWMonitoringReportException( __METHOD__ . " : $reportName already exits" );
+            $lastReport = eZSiteData::fetchByName( 'report_' . $reportName );
+            if( $lastReport ) {
+                $lastReportDate = new DateTime( $lastReport->attribute( 'value' ) );
+                if( $lastReportDate >= $fromDate && $lastReportDate < $toDate ) {
+                    throw new OWMonitoringReportException( __METHOD__ . " : $reportName already exits" );
+                }
             }
         }
         $report = self::makeReport( $reportName, TRUE );
         $report->store( );
+        $siteData = new eZSiteData( array(
+            'name' => 'report_' . $reportName,
+            'value' => date( 'Y-m-d H:i:s' )
+        ) );
+        $siteData->store( );
         OWMonitoringLogger::logNotice( __METHOD__ . " : Report " . $report->getIdentifier( ) . " is stored in the database" );
     }
 
@@ -354,6 +362,13 @@ class OWMonitoringReport extends eZPersistentObject {
 
     static function fetchCount( $identifier = NULL, $fromDate = NULL, $toDate = NULL ) {
         return count( self::fetchList( $identifier, $fromDate, $toDate ) );
+    }
+
+    static function removeOldReports( $reportLifetime ) {
+        return self::removeObject( self::definition( ), array( 'date' => array(
+                '>',
+                date( 'Y-m-d H:i:s', strtotime( '+' . $reportLifetime . ' minute' ) )
+            ) ) );
     }
 
 }
