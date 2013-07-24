@@ -12,11 +12,11 @@ abstract class eZLogReport_BaseAnalyser {
     protected function analyzeLogfile( $file ) {
         if( $file == NULL ) {
             OWMonitoringLogger::writeError( __METHOD__ . " : Logfile path not defined" );
-            return FALSE;
+            throw new OWMonitoringReportNoValueException( );
         }
         if( !is_readable( $file ) ) {
             OWMonitoringLogger::writeError( __METHOD__ . " : $file not readable" );
-            return FALSE;
+            throw new OWMonitoringReportNoValueException( );
         }
         $this->file = $file;
         $this->parseFile( );

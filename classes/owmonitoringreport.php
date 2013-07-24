@@ -228,6 +228,7 @@ class OWMonitoringReport extends eZPersistentObject {
             $forceClock = time( );
         }
         foreach( $testList as $testIdentifier => $testFunction ) {
+            $stroreValue = TRUE;
             list( $testClass, $testMethod ) = explode( '::', $testFunction );
             $testClass = $reportName . '_' . $testClass;
             $testMethod = 'test' . $testMethod;
@@ -241,11 +242,13 @@ class OWMonitoringReport extends eZPersistentObject {
             } else {
                 try {
                     $testValue = call_user_func( $testFunction );
-                } catch (  Exception $e ) {
+                } catch (  OWMonitoringReportNoValueException $e ) {
                     OWMonitoringLogger::logError( __METHOD__ . " : " . $e->getMessage( ) );
-                    $testValue = FALSE;
+                    $stroreValue = FALSE;
                 }
-                $report->setData( $testIdentifier, $testValue, $forceClock );
+                if( $stroreValue ) {
+                    $report->setData( $testIdentifier, $testValue, $forceClock );
+                }
             }
         }
         if( $report->countDatas( ) == 0 ) {

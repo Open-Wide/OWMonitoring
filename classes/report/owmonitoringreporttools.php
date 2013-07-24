@@ -12,7 +12,7 @@ class OWMonitoringReportTools {
         try {
             $rows = $db->arrayQuery( $query );
         } catch( Exception $e ) {
-            throw $e;
+            throw new OWMonitoringReportNoValueException( );
         }
         return isset( $rows[0] ) && isset( $rows[0]['row_count'] ) ? $rows[0]['row_count'] : FALSE;
     }
