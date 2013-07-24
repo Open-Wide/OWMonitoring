@@ -197,7 +197,7 @@ class OWMonitoringReport extends eZPersistentObject {
                 }
             }
         }
-        $report = self::makeReport( $reportName, TRUE );
+        $report = self::makeReport( $reportName );
         $report->store( );
         $siteData = new eZSiteData( array(
             'name' => 'report_' . $reportName,
