@@ -160,6 +160,7 @@ class OWMonitoringReport extends eZPersistentObject {
                     $toDate->modify( '+1 minute' );
                     break;
                 case 'quarter_hour' :
+                    $date = new DateTime( date( 'Y-m-d H:i:00' ) );
                     $quarter = intval( $date->format( 'i' ) / 15 );
                     $fromDate = new DateTime( date( 'Y-m-d H:' . (15 * $quarter) . ':00' ) );
                     $toDate = clone($fromDate);
