@@ -7,44 +7,46 @@ $schema = array(
             'identifier' => array(
                 'length' => 100,
                 'type' => 'varchar',
-                'default' => false,
+                'not_null' => TRUE,
+                'default' => FALSE,
             ),
             'date' => array(
                 'type' => 'datetime',
-                'default' => false,
+                'default' => FALSE,
+                'not_null' => TRUE,
             ),
             'serialized_data' => array(
                 'type' => 'longtext',
-                'default' => false,
+                'default' => FALSE,
             ),
             'request_result' => array(
                 'length' => 100,
                 'type' => 'varchar',
-                'default' => null,
+                'default' => NULL,
             ),
             'processed' => array(
                 'length' => 11,
                 'type' => 'int',
-                'default' => null,
+                'default' => NULL,
             ),
             'failed' => array(
                 'length' => 11,
                 'type' => 'int',
-                'default' => null,
+                'default' => NULL,
             ),
             'total' => array(
                 'length' => 11,
                 'type' => 'int',
-                'default' => null,
+                'default' => NULL,
             ),
             'status' => array(
                 'length' => 11,
                 'type' => 'int',
-                'default' => null,
+                'default' => NULL,
             ),
             'last_sending' => array(
                 'type' => 'datetime',
-                'default' => null,
+                'default' => NULL,
             )
         ),
         'indexes' => array( ),
