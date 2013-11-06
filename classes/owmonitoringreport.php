@@ -2,17 +2,18 @@
 
 class OWMonitoringReport extends eZPersistentObject {
 
+    protected $reportName;
     protected $identifier;
     protected $reportData;
     protected $date;
-    protected $serialized_data;
+    protected $serializedData;
 
-    protected $request_result;
+    protected $requestResult;
     protected $processed;
     protected $failed;
     protected $total;
     protected $status;
-    protected $last_sending;
+    protected $lastSending;
 
     public function __construct( $identifier_or_row ) {
         if( is_array( $identifier_or_row ) ) {
@@ -24,7 +25,7 @@ class OWMonitoringReport extends eZPersistentObject {
             $this->identifier = $identifier_or_row;
             $this->reportData = array( );
         }
-        if( !empty( $this->serialized_data ) ) {
+        if( !empty( $this->serializedData ) ) {
             $this->reportData = unserialize( $this->attribute( 'serialized_data' ) );
         }
     }
@@ -124,7 +125,18 @@ class OWMonitoringReport extends eZPersistentObject {
             OWMonitoringLogger::logError( __METHOD__ . " : Class $monitoringToolClass not found" );
             return FALSE;
         }
+
+        if( !$INI->hasVariable( $this->reportName, 'Hostname' ) ) {
+            OWMonitoringLogger::logError( __METHOD__ . " : [" . $this->reportName . "]Hostname not defined in owmonitoring.ini" );
+            return FALSE;
+        }
+        $hostnameList = $INI->variable( $this->reportName, 'Hostname' );
+        if( !is_array( $hostnameList ) && empty( $hostnameList ) ) {
+            OWMonitoringLogger::logError( __METHOD__ . " : [" . $this->reportName . "]Hostname must be an nonempty array." );
+            return FALSE;
+        }
         $tool = $monitoringToolClass::instance( );
+        $tool->setHostnameList( $hostnameList );
         $sendingResult = $tool->sendReport( $this );
         switch ($sendingResult['status']) {
             case OWMonitoringTool::SENDING_SUCCESSFUL :
@@ -222,6 +234,7 @@ class OWMonitoringReport extends eZPersistentObject {
         }
         try {
             $report = new OWMonitoringReport( $identifier );
+            $report->setAttribute( 'report_name', $reportName );
         } catch( Exception $e ) {
             throw new OWMonitoringReportException( __METHOD__ . " : Report instancation failed\n" . $e->getMessage( ) );
         }
@@ -229,7 +242,7 @@ class OWMonitoringReport extends eZPersistentObject {
             $forceClock = time( );
         }
         foreach( $testList as $testIdentifier => $testFunction ) {
-            $stroreValue = TRUE;
+            $storeValue = TRUE;
             list( $testClass, $testMethod ) = explode( '::', $testFunction );
             $testClass = $reportName . '_' . $testClass;
             $testMethod = 'test' . $testMethod;
@@ -245,9 +258,9 @@ class OWMonitoringReport extends eZPersistentObject {
                     $testValue = call_user_func( $testFunction );
                 } catch (  OWMonitoringReportNoValueException $e ) {
                     OWMonitoringLogger::logError( __METHOD__ . " : " . $e->getMessage( ) );
-                    $stroreValue = FALSE;
+                    $storeValue = FALSE;
                 }
-                if( $stroreValue ) {
+                if( $storeValue ) {
                     $report->setData( $testIdentifier, $testValue, $forceClock );
                 }
             }
@@ -263,6 +276,12 @@ class OWMonitoringReport extends eZPersistentObject {
     public static function definition( ) {
         return array(
             'fields' => array(
+                'report_name' => array(
+                    'name' => 'reportName',
+                    'datatype' => 'string',
+                    'default' => null,
+                    'required' => true
+                ),
                 'identifier' => array(
                     'name' => 'identifier',
                     'datatype' => 'string',
@@ -276,13 +295,13 @@ class OWMonitoringReport extends eZPersistentObject {
                     'required' => true
                 ),
                 'serialized_data' => array(
-                    'name' => 'serialized_data',
+                    'name' => 'serializedData',
                     'datatype' => 'text',
                     'default' => null,
                     'required' => true
                 ),
                 'request_result' => array(
-                    'name' => 'request_result',
+                    'name' => 'requestResult',
                     'datatype' => 'string',
                     'default' => null,
                     'required' => false
@@ -312,7 +331,7 @@ class OWMonitoringReport extends eZPersistentObject {
                     'required' => false
                 ),
                 'last_sending' => array(
-                    'name' => 'last_sending',
+                    'name' => 'lastSending',
                     'datatype' => 'string',
                     'default' => null,
                     'required' => false

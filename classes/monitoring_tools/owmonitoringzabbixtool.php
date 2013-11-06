@@ -7,13 +7,17 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
     protected $checkINI = FALSE;
     protected $serverName;
     protected $serverPort;
-    protected $hostname;
+    protected $hostnameList;
 
     static function instance( ) {
         if( !isset( $GLOBALS['OWMonitoringZabbixToolGlobalInstance'] ) || !($GLOBALS['OWMonitoringZabbixToolGlobalInstance'] instanceof self) ) {
             $GLOBALS['OWMonitoringZabbixToolGlobalInstance'] = new self( );
         }
         return $GLOBALS['OWMonitoringZabbixToolGlobalInstance'];
+    }
+
+    public function setHostnameList( $hostnameList ) {
+        $this->hostnameList = $hostnameList;
     }
 
     public function __construct( ) {
@@ -31,13 +35,23 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             OWMonitoringLogger::logError( "Report " . $report->getIdentifier( ) . " can not be sent to Zabbix. Bad configuration." );
             return FALSE;
         }
+        if( !is_array( $this->hostnameList ) && empty( $this->hostnameList ) ) {
+            OWMonitoringLogger::logError( "Report " . $report->getIdentifier( ) . " can not be sent to Zabbix. The hostname is not defined." );
+            return FALSE;
+        }
         $dataList = $report->getDatas( );
         $defaultClock = $report->getClock( );
         $dataIDList = array( );
+        if( empty( $dataList ) ) {
+            OWMonitoringLogger::logError( "Report " . $report->getIdentifier( ) . " can not be sent to Zabbix. Report is empty." );
+            return FALSE;
+        }
         foreach( $dataList as $name => $valueArray ) {
             foreach( $valueArray as $valueItem ) {
                 $clock = isset( $valueItem['clock'] ) ? $valueItem['clock'] : $defaultClock;
-                $this->sender->addData( $this->hostname, $report->getIdentifier( ) . '.' . $name, $valueItem['data'], $clock );
+                foreach( $this->hostnameList as $hostname ) {
+                    $this->sender->addData( $hostname, $report->getIdentifier( ) . '.' . $name, $valueItem['data'], $clock );
+                }
                 $dataIDList[] = $report->getIdentifier( ) . '.' . $name;
             }
         }
@@ -109,17 +123,6 @@ class OWMonitoringZabbixTool extends OWMonitoringTool {
             if( empty( $this->serverPort ) ) {
                 OWMonitoringLogger::logNotice( "[Zabbix]serverPort is empty. Use default port 10051." );
                 $this->serverPort = 10051;
-            }
-        }
-
-        if( !$toolINI->hasVariable( 'Zabbix', 'Hostname' ) ) {
-            OWMonitoringLogger::logError( "[Zabbix]Hostname not defined in owmonitoringtool.ini" );
-            $this->checkINI = FALSE;
-        } else {
-            $this->hostname = $toolINI->variable( 'Zabbix', 'Hostname' );
-            if( empty( $this->hostname ) ) {
-                OWMonitoringLogger::logError( "[Zabbix]Hostname is empty" );
-                $this->checkINI = FALSE;
             }
         }
         return $this->checkINI;

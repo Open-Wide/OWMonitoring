@@ -4,6 +4,12 @@ $schema = array(
     'owmonitoring_report' => array(
         'name' => 'owmonitoring_report',
         'fields' => array(
+            'report_name' => array(
+                'length' => 100,
+                'type' => 'varchar',
+                'not_null' => TRUE,
+                'default' => FALSE,
+            ),
             'identifier' => array(
                 'length' => 100,
                 'type' => 'varchar',
