@@ -1,6 +1,7 @@
 <?php
 
 class eZShop_Monitoring {
+    
     static function testTemporaryOrderCount( ) {
         $lastAnalysis = eZSiteData::fetchByName( 'report_eZShop' );
         $createdFilter = '';

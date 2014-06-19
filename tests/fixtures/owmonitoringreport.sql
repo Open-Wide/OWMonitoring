@@ -26,11 +26,11 @@ VALUES ( 'test.quarter_hour',  NOW(),  'a:2:{s:4:"test";a:1:{i:0;a:1:{s:4:"data"
 
 
 INSERT INTO  `owmonitoring_report` ( `identifier` , `date` , `serialized_data` )
-VALUES ( 'test.houly',  '2013-07-17 00:00:00',  'a:2:{s:4:"test";a:1:{i:0;a:1:{s:4:"data";s:4:"test";}}s:6:"test_2";a:1:{i:0;a:1:{s:4:"data";s:6:"test_1";}}}');
+VALUES ( 'test.hourly',  '2013-07-17 00:00:00',  'a:2:{s:4:"test";a:1:{i:0;a:1:{s:4:"data";s:4:"test";}}s:6:"test_2";a:1:{i:0;a:1:{s:4:"data";s:6:"test_1";}}}');
 INSERT INTO  `owmonitoring_report` ( `identifier` , `date` , `serialized_data` )
-VALUES ( 'test.houly',  '2013-07-17 01:00:00',  'a:2:{s:4:"test";a:1:{i:0;a:1:{s:4:"data";s:4:"test";}}s:6:"test_2";a:1:{i:0;a:1:{s:4:"data";s:6:"test_1";}}}');
+VALUES ( 'test.hourly',  '2013-07-17 01:00:00',  'a:2:{s:4:"test";a:1:{i:0;a:1:{s:4:"data";s:4:"test";}}s:6:"test_2";a:1:{i:0;a:1:{s:4:"data";s:6:"test_1";}}}');
 INSERT INTO  `owmonitoring_report` ( `identifier` , `date` , `serialized_data` )
-VALUES ( 'test.houly',  NOW(),  'a:2:{s:4:"test";a:1:{i:0;a:1:{s:4:"data";s:4:"test";}}s:6:"test_2";a:1:{i:0;a:1:{s:4:"data";s:6:"test_1";}}}');
+VALUES ( 'test.hourly',  NOW(),  'a:2:{s:4:"test";a:1:{i:0;a:1:{s:4:"data";s:4:"test";}}s:6:"test_2";a:1:{i:0;a:1:{s:4:"data";s:6:"test_1";}}}');
 
 INSERT INTO  `owmonitoring_report` ( `identifier` , `date` , `serialized_data` )
 VALUES ( 'test.daily',  '2013-07-17 00:00:00',  'a:2:{s:4:"test";a:1:{i:0;a:1:{s:4:"data";s:4:"test";}}s:6:"test_2";a:1:{i:0;a:1:{s:4:"data";s:6:"test_1";}}}');

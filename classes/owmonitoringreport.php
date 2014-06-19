@@ -178,7 +178,7 @@ class OWMonitoringReport extends eZPersistentObject {
                     $toDate = clone($fromDate);
                     $toDate->modify( '+15 minute' );
                     break;
-                case 'houly' :
+                case 'hourly' :
                     $fromDate = new DateTime( date( 'Y-m-d H:00:00' ) );
                     $toDate = clone($fromDate);
                     $toDate->modify( '+1 hour' );
