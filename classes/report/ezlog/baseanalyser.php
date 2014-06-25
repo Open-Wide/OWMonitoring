@@ -33,7 +33,7 @@ abstract class eZLogReport_BaseAnalyser {
                     $parseLine = FALSE;
                     if( is_callable( 'DateTime::createFromFormat' ) ) {
                         $logDate = DateTime::createFromFormat( '[ M d Y H:i:s ]', current( $matches ) );
-                        if( $logDate > $logDate ) {
+                        if( $logDate > $this->lastAnalysis ) {
                             $parseLine = TRUE;
                         }
                     } else {

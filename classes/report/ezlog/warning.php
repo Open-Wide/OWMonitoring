@@ -4,8 +4,8 @@ class eZLogReport_Warning extends eZLogReport_BaseAnalyser {
 
     static function testAnalyseLog( ) {
         $analyser = new self( );
-        $retult = $analyser->analyzeLogfile( 'var/log/warning.log' );
-        return $retult;
+        $result = $analyser->analyzeLogfile( 'var/log/warning.log' );
+        return $result;
     }
 
     public function __construct( ) {
@@ -20,7 +20,7 @@ class eZLogReport_Warning extends eZLogReport_BaseAnalyser {
         if( $lastAnalysis ) {
             $this->lastAnalysis = new DateTime( $lastAnalysis->attribute( 'value' ) );
         }
-        foreach( $this->reportedList as $key => $value ) {
+        foreach( array_keys( $this->reportedList ) as $key ) {
             $this->report[$key] = 0;
         }
     }
