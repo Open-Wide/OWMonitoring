@@ -8,6 +8,7 @@ abstract class eZLogReport_BaseAnalyser {
     protected $ignoredList = array( );
     protected $report = array( 'other' => 0 );
     protected $lastAnalysis = null;
+    protected $messages = array();
 
     protected function analyzeLogfile( $file ) {
         if( $file == NULL ) {
@@ -20,6 +21,7 @@ abstract class eZLogReport_BaseAnalyser {
         }
         $this->file = $file;
         $this->parseFile( );
+        $this->report['message_details'] = implode( PHP_EOL, array_unique( $this->messages  ) );
         return $this->report;
     }
 
@@ -53,6 +55,8 @@ abstract class eZLogReport_BaseAnalyser {
     protected function parseLine( ) {
         $this->line = preg_replace( '/\n/', ' ', $this->line );
         $this->line = preg_replace( '/[ ]+/', ' ', $this->line );
+        $this->line = trim( preg_replace( '/^\[ [a-zA-Z]{3} [0-9]{2} [0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2} \]/', '', $this->line ) );
+        $this->line = trim( preg_replace( '/^\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\]/', ' ', $this->line ) );
         foreach( $this->ignoredList as $ignored ) {
             if( preg_match( $ignored, $this->line ) > 0 ) {
                 return;
@@ -61,6 +65,7 @@ abstract class eZLogReport_BaseAnalyser {
         foreach( $this->reportedList as $reportedKey => $reported ) {
             if( preg_match( $reported, $this->line ) > 0 ) {
                 $this->reporte( $reportedKey );
+                $this->messages[] = $this->line;
                 continue;
             }
         }

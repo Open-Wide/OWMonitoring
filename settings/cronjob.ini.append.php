@@ -15,4 +15,4 @@ Scripts[]=owmonitoring_sendreports.php
 Scripts[]
 Scripts[]=owmonitoring_cleanup.php
 
-*/ ?>
+*/
