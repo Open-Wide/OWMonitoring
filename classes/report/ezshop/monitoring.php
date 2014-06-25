@@ -10,7 +10,7 @@ class eZShop_Monitoring {
             $createdFilter = ' AND created > ' . $lastAnalysisDate->format( 'U' );
         }
         try {
-            return OWMonitoringReportTools::executeCountQuery( 'ezbasket', 'is_temporary = TRUE' . $createdFilter );
+            return OWMonitoringReportTools::executeCountQuery( 'ezorder', 'is_temporary = TRUE' . $createdFilter );
         } catch( OWMonitoringReportNoValueException $e ) {
             return 0;
         }
@@ -25,7 +25,7 @@ class eZShop_Monitoring {
             $createdFilter = ' AND created > ' . $lastAnalysisDate->format( 'U' );
         }
         try {
-            $result['total'] = OWMonitoringReportTools::executeCountQuery( 'ezbasket', 'is_temporary = FALSE' . $createdFilter );
+            $result['total'] = OWMonitoringReportTools::executeCountQuery( 'ezorder', 'is_temporary = FALSE' . $createdFilter );
         } catch( OWMonitoringReportNoValueException $e ) {
             $result['total'] = 0;
         }
@@ -34,7 +34,7 @@ class eZShop_Monitoring {
         foreach( $orderStatusList as $orderStatus ) {
             $statusName = $trans->transformByGroup( $orderStatus->attribute( 'name' ), 'identifier' );
             try {
-                $result[$statusName] = OWMonitoringReportTools::executeCountQuery( 'ezbasket', 'is_temporary = FALSE AND status_id = ' . $orderStatus->attribute( 'status_id' ) . $createdFilter );
+                $result[$statusName] = OWMonitoringReportTools::executeCountQuery( 'ezorder', 'is_temporary = FALSE AND status_id = ' . $orderStatus->attribute( 'status_id' ) . $createdFilter );
             } catch( OWMonitoringReportNoValueException $e ) {
                 $result[$statusName] = 0;
             }
