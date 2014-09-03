@@ -2,7 +2,7 @@
 
 require_once 'tests/owmonitoringreport_test.php';
 
-class OWMonitiringTestSuite extends ezpDatabaseTestSuite {
+class OWMonitoringTestSuite extends ezpDatabaseTestSuite {
     
     protected $sqlFiles = array( 'extension/owmonitoring/tests/fixtures/owmonitoringreport.sql' );
     
