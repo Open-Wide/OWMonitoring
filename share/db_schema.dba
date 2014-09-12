@@ -53,6 +53,10 @@ $schema = array(
             'last_sending' => array(
                 'type' => 'datetime',
                 'default' => NULL,
+            ),
+            'mail_sent' => array(
+                'type' => 'datetime',
+                'default' => NULL,
             )
         ),
         'indexes' => array( ),
