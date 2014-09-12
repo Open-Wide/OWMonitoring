@@ -70,6 +70,7 @@ abstract class eZLogReport_BaseAnalyser {
             }
         }
         $this->reporte( 'other' );
+        $this->messages[] = $this->line;
     }
 
     protected function reporte( $reportCode ) {
