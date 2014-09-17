@@ -5,17 +5,16 @@ class OWMonitoringReport extends eZPersistentObject {
     protected $reportData = array();
 
     public function __construct( $identifier_or_row ) {
-        if ( is_array( $identifier_or_row ) ) {
-            parent::__construct( $identifier_or_row );
-        } else {
-            if ( empty( $identifier_or_row ) ) {
-                throw new OWMonitoringReportException( __METHOD__ . " : Report identifier must be set" );
-            }
-            parent::__construct( array( 'identifier', $identifier_or_row ) );
-            $serializedData = $this->attribute( 'serialized_data' );
-            if ( !empty( $serializedData ) ) {
-                $this->reportData = unserialize( $serializedData );
-            }
+        if ( empty( $identifier_or_row ) ) {
+            throw new OWMonitoringReportException( __METHOD__ . " : Report identifier must be set" );
+        }
+        if ( is_string( $identifier_or_row ) ) {
+            $identifier_or_row = array( 'identifier' => $identifier_or_row );
+        }
+        parent::__construct( $identifier_or_row );
+        $serializedData = $this->attribute( 'serialized_data' );
+        if ( !empty( $serializedData ) ) {
+            $this->reportData = unserialize( $serializedData );
         }
         if ( $this->attribute( 'date' ) == NULL ) {
             $this->setAttribute( 'date', date( 'Y-m-d H:i:s' ) );
