@@ -9,7 +9,7 @@ class eZInfo_Versions {
     static function testExtension() {
         $extensionInfoString = '';
         foreach ( eZExtension::activeExtensions() as $extension ) {
-            $extensionInfo = eZExtension::extensionInfo( $extension );
+            @$extensionInfo = eZExtension::extensionInfo( $extension );
             if ( $extensionInfo ) {
                 $name = isset( $extensionInfo['name'] ) ? $extensionInfo['name'] : 'unknown name';
                 $version = isset( $extensionInfo['version'] ) ? $extensionInfo['version'] : 'unknown version';
