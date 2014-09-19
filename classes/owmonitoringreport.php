@@ -138,8 +138,10 @@ class OWMonitoringReport extends eZPersistentObject {
         }
         if ( $sendByMail && !$this->attribute( 'mail_sent' ) ) {
             $sendByMailResult = $this->sendByMail();
-            $this->setAttribute( 'mail_sent', date( 'Y-m-d H:i:s' ) );
-            $this->store();
+            if ( $sendByMailResult ) {
+                $this->setAttribute( 'mail_sent', date( 'Y-m-d H:i:s' ) );
+                $this->store();
+            }
         }
         if ( $sendToMonitoringTool && $this->attribute( 'status' ) != OWMonitoringTool::SENDING_SUCCESSFUL ) {
             if ( !$INI->hasVariable( 'OWMonitoring', 'MonitoringToolClass' ) ) {
