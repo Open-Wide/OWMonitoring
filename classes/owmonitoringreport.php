@@ -208,7 +208,7 @@ class OWMonitoringReport extends eZPersistentObject {
         if ( $tpl->hasVariable( 'subject' ) ) {
             $subject = $tpl->variable( 'subject' );
         } else {
-            $subject = 'Report ' . $this->attribute( 'report_name' );
+            $subject = 'Report ' . $this->attribute( 'report_name' ) . ' ' . implode( ', ', $this->attribute( 'hostnames' ) );
         }
         $mail->setSubject( $subject );
 
